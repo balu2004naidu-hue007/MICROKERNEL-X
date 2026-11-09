@@ -16,18 +16,28 @@ Task scheduling · Context switching · Mutexes · IPC · Stack protection · Wa
 
 ---
 
-**Status:** Laptop-validated release candidate. Host regression tests and the ARM/QEMU runtime suite passed in the local development environment. Physical Cortex-M hardware validation and the first remote GitHub Actions run remain outstanding. This project is experimental and is not production-ready firmware.
+**Status:** Laptop-validated release candidate. Host regression tests and the ARM/QEMU runtime suite passed in the local development environment. Physical Cortex-M hardware validation and the first remote GitHub Pages deployment remain outstanding. This project is experimental and is not production-ready firmware.
 
 ## See the kernel output
 
-The repository includes a visual dashboard snapshot with event distribution, task activity and a filterable event timeline. It reflects actual records emitted by the C kernel during a host regression run; it is not a fabricated animation or live hardware telemetry. The kernel trace ring retains up to 64 recent events.
+The repository landing page includes a dashboard preview with event distribution, task activity and recovery information. It reflects actual records emitted by the C kernel during a host regression run; it is not a fabricated animation or live hardware telemetry. The kernel trace ring retains up to 64 recent events.
 
-Enable the interactive dashboard through **Settings → Pages → Build and deployment → GitHub Actions**. You can also open `docs/index.html` locally.
+The interactive dashboard is provided at `docs/index.html`. To publish it as a website, enable **Settings → Pages → Build and deployment → GitHub Actions**. The repository includes the Pages deployment workflow in `.github/workflows/pages.yml`.
 
-In the complete local source checkout, regenerate the dashboard from a fresh run:
+## Kernel architecture
 
-```bash
-make dashboard
+```mermaid
+flowchart TB
+  PORT[Host C runtime / ARM Cortex-M4 port] --> CORE[Task control · Scheduler · Context validation]
+  CORE --> MUTEX[Mutexes · Deadlock detection · Priority inheritance]
+  CORE --> IPC[IPC message queue · Waiters · Timeouts]
+  CORE --> MEM[Fixed-block bitmap memory pool]
+  CORE --> WD[Watchdog · Recovery · Isolation]
+  CORE --> TRACE[64-entry event trace]
+  MUTEX --> TRACE
+  IPC --> TRACE
+  WD --> TRACE
+  TRACE --> DASH[Python runner · Browser dashboard]
 ```
 
 ## Main capabilities
@@ -42,7 +52,7 @@ make dashboard
 
 ## Build and run
 
-In the complete project source checkout:
+The commands below are run from the complete local C source checkout:
 
 ```bash
 make test-host
@@ -52,6 +62,8 @@ make test-arm-qemu
 ```
 
 Requirements: GCC, GNU Make and Python 3 for host/dashboard; `arm-none-eabi-gcc`, `arm-none-eabi-objcopy`, `qemu-system-arm` and `gdb-multiarch` for ARM/QEMU validation.
+
+**Repository contents note:** this GitHub update publishes the project showcase, trace dashboard, preview image, license and Pages workflow. The full C implementation and Makefile from the validated local checkout have not yet been mirrored into this remote repository, so a fresh clone cannot run the build commands above until those source files are added.
 
 ## Validation record
 
@@ -74,7 +86,6 @@ These are local build and QEMU results, not physical hardware certification or a
 - The host critical-section implementation assumes a single-threaded host runtime.
 - The trace ring is bounded, not a persistent logging backend.
 - More interrupt-sequence, stress and concurrent-resource testing is required.
-- The GitHub Actions workflow has not yet had its first verified remote run.
 
 MIT License. See [LICENSE](LICENSE).
 
