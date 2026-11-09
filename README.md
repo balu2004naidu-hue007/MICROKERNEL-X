@@ -1,77 +1,82 @@
+<div align="center">
+
 # MICROKERNEL-X
 
-A lightweight microkernel project implemented in C to explore
-operating system fundamentals, task management, scheduling,
-and embedded-system concepts.
+**An experimental C microkernel / RTOS-style kernel with an ARM Cortex-M4 port**
 
-> 🚧 **Status: Under Active Development**
+Task scheduling · Context switching · Mutexes · IPC · Stack protection · Watchdog recovery
 
-## Project Overview
+<img src="docs/assets/dashboard-preview.svg" alt="MICROKERNEL-X real host execution dashboard preview" width="100%">
 
-MICROKERNEL-X is an ongoing learning and development project
-focused on understanding and implementing the core concepts
-behind a lightweight microkernel.
+**Dashboard preview generated from a real host execution of the C kernel.**
 
-The project is being developed incrementally in C, with each
-module being designed, implemented, tested, and integrated
-progressively.
+[Open the interactive dashboard](https://balu2004naidu-hue007.github.io/MICROKERNEL-X/)
 
-## Current Development
+</div>
 
-The current development focuses on:
+---
 
-- Task and process representation
-- Task states
-- Task Control Blocks (TCB)
-- Task management
-- Scheduling concepts
-- Kernel-level system organization
-- Embedded-oriented design
+**Status:** Laptop-validated release candidate. Host regression tests and the ARM/QEMU runtime suite passed in the local development environment. Physical Cortex-M hardware validation and the first remote GitHub Actions run remain outstanding. This project is experimental and is not production-ready firmware.
 
-## Development Roadmap
+## See the kernel output
 
-The project is planned to evolve through the following stages:
+The repository includes a visual dashboard snapshot with event distribution, task activity and a filterable event timeline. It reflects actual records emitted by the C kernel during a host regression run; it is not a fabricated animation or live hardware telemetry. The kernel trace ring retains up to 64 recent events.
 
-- [x] Basic task structure
-- [x] Task state definition
-- [x] Task Control Block (TCB)
-- [x] Initial task management
-- [ ] Scheduler implementation
-- [ ] Task switching
-- [ ] Inter-task communication
-- [ ] Synchronization mechanisms
-- [ ] Memory management
-- [ ] Interrupt handling
-- [ ] Kernel testing
-- [ ] Hardware/embedded integration
+Enable the interactive dashboard through **Settings → Pages → Build and deployment → GitHub Actions**. You can also open `docs/index.html` locally.
 
-## Technologies
+In the complete local source checkout, regenerate the dashboard from a fresh run:
 
-- C
-- Data Structures
-- Operating System Concepts
-- Embedded Systems Concepts
-- Git & GitHub
+```bash
+make dashboard
+```
 
-## Project Status
+## Main capabilities
 
-This project is **currently under active development**.
-Features and modules are being implemented progressively.
+- **Scheduling:** task lifecycle, priority-aware selection, time slicing, preemption, delays and idle-task support.
+- **Context protection:** initial and saved stack-frame validation, stack bounds and guards, high-water measurement and warnings.
+- **Recovery:** watchdog progress tracking, bounded restart attempts, resource cleanup and task isolation; recovery success requires demonstrated progress.
+- **Synchronization:** mutex ownership, circular deadlock detection, priority inheritance, waiter handoff and fault cleanup.
+- **IPC:** fixed-size message queue, receiver registration, wake-up, timeout and recovery cleanup.
+- **Memory:** fixed-block bitmap pool supporting up to 32 blocks, invalid-free/double-free detection and optional critical-section callbacks.
+- **ARM Cortex-M4 port:** startup, SVC, PendSV, SysTick, R4–R11 preservation and QEMU fault-injection tests.
 
-The repository will be updated continuously as new
-components are developed and tested.
+## Build and run
 
-## Future Scope
+In the complete project source checkout:
 
-Future development may include:
+```bash
+make test-host
+make dashboard
+make all
+make test-arm-qemu
+```
 
-- Improved scheduling mechanisms
-- Kernel services
-- Inter-process/task communication
-- Memory management
-- Synchronization
-- Interrupt and hardware interaction
-- Embedded-system deployment
+Requirements: GCC, GNU Make and Python 3 for host/dashboard; `arm-none-eabi-gcc`, `arm-none-eabi-objcopy`, `qemu-system-arm` and `gdb-multiarch` for ARM/QEMU validation.
+
+## Validation record
+
+The November 9, 2026 local validation reported:
+- Host executable exit code 0; memory-pool regression checks passed.
+- ARM memory-pool smoke test: 13 checks, 0 failures.
+- ARM stack high-water: 2 checks, 0 failures; stack warnings: 3 checks, 0 failures.
+- ARM context restart: 2 checks, 0 failures; scheduler recovery: 4 checks, 0 failures.
+- Register preservation: 1,000 checks, 0 failures.
+- ARM runtime: 2,002 context switches; SysTick reschedule requests and normal ticks: 2,002 each.
+- Time-slice progress/expiry checks: 2,002 each, with 0 timing failures.
+- Stack guard and saved PC/xPSR corruption detected; invalid saved-stack-pointer task isolated.
+
+These are local build and QEMU results, not physical hardware certification or a universal performance claim.
+
+## Known limitations
+
+- Physical STM32L476/Cortex-M hardware validation has not been performed.
+- SysTick timing assumes the demo's stated reset-clock configuration; the actual board clock must be verified.
+- The host critical-section implementation assumes a single-threaded host runtime.
+- The trace ring is bounded, not a persistent logging backend.
+- More interrupt-sequence, stress and concurrent-resource testing is required.
+- The GitHub Actions workflow has not yet had its first verified remote run.
+
+MIT License. See [LICENSE](LICENSE).
 
 ## Author
 
