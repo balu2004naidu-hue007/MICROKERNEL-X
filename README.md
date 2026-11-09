@@ -6,7 +6,7 @@
 
 Task scheduling · Context switching · Mutexes · IPC · Stack protection · Watchdog recovery
 
-<img src="docs/assets/dashboard-preview.svg" alt="MICROKERNEL-X real host execution dashboard preview" width="100%">
+<img src="https://raw.githubusercontent.com/balu2004naidu-hue007/MICROKERNEL-X/main/docs/assets/dashboard-preview.svg" alt="MICROKERNEL-X real host execution dashboard preview" width="100%">
 
 **Dashboard preview generated from a real host execution of the C kernel.**
 
