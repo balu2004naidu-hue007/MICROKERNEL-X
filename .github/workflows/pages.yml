@@ -41,6 +41,8 @@ jobs:
         with:
           version: 3.1.64
           actions-cache-folder: 'emsdk-cache'
+      - name: Generate the host dashboard snapshot from C kernel APIs
+        run: make dashboard-demo
       - name: Compile MICROKERNEL-X C modules to WebAssembly
         run: |
           emcc -std=c11 -O2 -I. \
