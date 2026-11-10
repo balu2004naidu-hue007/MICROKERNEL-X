@@ -10,10 +10,9 @@
 #define printf(...) ((void)0)
 #endif
 #ifndef MICROKERNEL_ARM
+#include <time.h>
 #ifdef __EMSCRIPTEN__
 #include <emscripten/emscripten.h>
-#else
-#include <time.h>
 #endif
 #endif
 
