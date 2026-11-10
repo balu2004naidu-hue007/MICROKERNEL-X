@@ -23,8 +23,25 @@ static union {
 static void *allocations[POOL_BLOCKS];
 static TraceEvent event_snapshot[TRACE_BUFFER_SIZE];
 static unsigned int event_snapshot_count;
+static unsigned long demo_dispatches[DEMO_TASKS];
 
-static void DemoTask(TaskControlBlock *task) { (void)task; }
+/*
+ * Give the browser demonstration a realistic mix of short-running and
+ * periodically blocked tasks. This changes only the demo workload; the
+ * production scheduler's priority policy remains untouched.
+ */
+static void DemoTask(TaskControlBlock *task) {
+    if (task == NULL || task->id < 1 || task->id > DEMO_TASKS) return;
+
+    unsigned int index = (unsigned int)(task->id - 1);
+    demo_dispatches[index]++;
+
+    /* Higher-priority sensor/communication tasks periodically wait for input. */
+    if ((index < 2 && demo_dispatches[index] % 2U == 0U) ||
+        (index >= 2 && demo_dispatches[index] % 2U == 0U)) {
+        Scheduler_Delay(task, index < 2 ? 3U : 2U);
+    }
+}
 
 static void RefreshEvents(void) {
     event_snapshot_count = Kernel_Trace_Copy(event_snapshot, TRACE_BUFFER_SIZE);
@@ -35,7 +52,7 @@ int MK_Init(void) {
     Kernel_IPC_Init();
     Scheduler_Init(&registry);
     Kernel_Mutex_Init(&demo_mutex);
-    for (int i = 0; i < DEMO_TASKS; ++i) {
+    for (int i = 0; i < DEMO_TASKS; ++i) {\n        demo_dispatches[i] = 0;
         static const char *names[DEMO_TASKS] = {
             "SensorTask", "CommunicationTask", "WorkerTask",
             "RecoveryTask", "IsolationProbe"
