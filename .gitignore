@@ -1,0 +1,21 @@
+# Build outputs
+build/
+*.exe
+*.o
+*.elf
+*.bin
+*.map
+
+# Temporary logs and test outputs
+*.log
+*_output.txt
+header_check.txt
+host_baseline.txt
+output.txt
+
+# Editor and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+__pycache__/
