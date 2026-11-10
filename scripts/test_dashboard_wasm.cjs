@@ -4,10 +4,13 @@ const createModule = require("../docs/kernel.js");
 (async () => {
   const m = await createModule();
   assert.equal(m._MK_Init(), 0, "kernel initialization");
-  for (let i = 0; i < 12; i++) m._MK_Step();
+  for (let i = 0; i < 80; i++) m._MK_Step();
   assert.equal(m._MK_GetTaskCount(), 5, "five task control blocks");
   assert.ok(m._MK_GetTick() >= 12, "scheduler ticks advance");
   assert.ok(m._MK_GetContextSwitches() > 0, "scheduler switches tasks");
+  for (let i = 0; i < 5; i++) {
+    assert.ok(m._MK_GetTaskProgress(i) > 0, `demo task ${i} receives execution time`);
+  }
   assert.equal(m._MK_MutexScenario(), 0, "mutex contention and ownership handoff");
   assert.equal(m._MK_IPCScenario(), 0, "IPC send, wake and receive");
   assert.equal(m._MK_InjectWatchdog(), 0, "watchdog detection and verified recovery");
