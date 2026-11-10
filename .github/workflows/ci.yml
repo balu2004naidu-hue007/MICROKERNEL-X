@@ -1,0 +1,30 @@
+name: MICROKERNEL-X regression checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  host-and-arm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Install host, ARM and QEMU toolchains
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential python3 gcc-arm-none-eabi binutils-arm-none-eabi qemu-system-arm gdb-multiarch
+      - name: Run host and memory-pool regression tests
+        run: make -B test-host
+      - name: Build Cortex-M4 firmware
+        run: make -B arm-demo
+      - name: Run Cortex-M4 QEMU/GDB runtime tests
+        run: make test-arm-qemu
+      - name: Validate generated dashboard snapshot
+        run: make -B dashboard-test
