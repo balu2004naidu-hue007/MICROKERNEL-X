@@ -3,7 +3,7 @@
 **An experimental C microkernel / RTOS-style project with a Cortex-M4 context-switching port.**
 
 <p align="center">
-  <a href="https://balu2004naidu-hue007.github.io/MICROKERNEL-X/"><strong>Open the interactive kernel dashboard ↗</strong></a>
+  <a href="https://balu2004naidu-hue007.github.io/MICROKERNEL-X/live.html"><strong>Run the interactive kernel lab ↗</strong></a> &nbsp;·&nbsp; <a href="https://balu2004naidu-hue007.github.io/MICROKERNEL-X/"><strong>Open dashboard overview ↗</strong></a>
   &nbsp;·&nbsp;
   <a href="#run-the-visual-dashboard">Run the dashboard locally</a>
   &nbsp;·&nbsp;
@@ -16,7 +16,7 @@
 
 ## What you can see
 
-The repository includes an interactive, static dashboard for exploring a deterministic host demonstration of the kernel. It visualizes:
+The repository includes two browser views: a dashboard overview backed by a reproducible host snapshot, and an interactive WebAssembly lab that executes the portable MICROKERNEL-X C modules directly in the browser. The overview visualizes:
 
 - Task Control Blocks and their READY, RUNNING, BLOCKED, WAITING and FAULTED states.
 - Scheduler decisions, context switches and explicit task-progress reports.
@@ -25,11 +25,11 @@ The repository includes an interactive, static dashboard for exploring a determi
 - Watchdog fault detection, task restart, verified recovery and isolation.
 - Fixed-block memory-pool availability.
 
-**The dashboard uses real kernel C APIs.** `dashboard_demo.c` exercises the same task, scheduler, mutex, IPC, watchdog/recovery, trace and memory-pool modules, then exports the retained kernel trace and task snapshot as JSON. It is a deterministic host demonstration, not fabricated live hardware telemetry.
+**The snapshot dashboard uses real kernel C APIs.** `dashboard_demo.c` exercises the task, scheduler, mutex, IPC, watchdog/recovery, trace and memory-pool modules, then exports the retained kernel trace and task snapshot as JSON. The [interactive kernel lab](https://balu2004naidu-hue007.github.io/MICROKERNEL-X/live.html) goes further: GitHub Actions compiles those portable C modules to WebAssembly, and browser controls call the compiled C APIs to advance scheduler ticks, run mutex and IPC scenarios, inject watchdog faults, verify recovery, isolate a task and allocate/free memory blocks. Its task registry and event trace update after each action. Neither view is live telemetry from a physical board.
 
 ### Dashboard preview
 
-Open the [interactive dashboard](https://balu2004naidu-hue007.github.io/MICROKERNEL-X/) after GitHub Pages deployment, or run it locally using the instructions below.
+Open the [interactive WebAssembly kernel lab](https://balu2004naidu-hue007.github.io/MICROKERNEL-X/live.html) or the [dashboard overview](https://balu2004naidu-hue007.github.io/MICROKERNEL-X/). The overview can also be run locally using the instructions below.
 
 ## Core features
 
@@ -176,7 +176,7 @@ After the dashboard instrumentation was added, the host regression suite and das
 
 - Host: GCC and GNU Make.
 - ARM/QEMU: `arm-none-eabi-gcc`, `arm-none-eabi-objcopy`, QEMU ARM system emulation and `gdb-multiarch`.
-- Dashboard: any modern browser; Python 3 is used only for the local static HTTP server (or any equivalent static web server).
+- Dashboard overview: any modern browser; Python 3 is used only for the local static HTTP server (or any equivalent static web server).\n- Interactive WebAssembly lab build: Emscripten SDK (automatically installed by the GitHub Pages workflow).
 
 ## License
 
