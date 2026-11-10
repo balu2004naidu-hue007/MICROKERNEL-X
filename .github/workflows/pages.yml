@@ -5,6 +5,16 @@ on:
     branches: [main]
     paths:
       - 'docs/**'
+      - 'dashboard_wasm.c'
+      - 'task.c'
+      - 'scheduler.c'
+      - 'kernel_ipc.c'
+      - 'mutex.c'
+      - 'trace.c'
+      - 'ipc.c'
+      - 'memory_pool.c'
+      - '*.h'
+      - 'scripts/test_dashboard_wasm.cjs'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 
@@ -26,6 +36,22 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+      - name: Set up Emscripten
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 3.1.64
+          actions-cache-folder: 'emsdk-cache'
+      - name: Compile MICROKERNEL-X C modules to WebAssembly
+        run: |
+          emcc -std=c11 -O2 -I. \
+            dashboard_wasm.c task.c scheduler.c kernel_ipc.c mutex.c trace.c ipc.c memory_pool.c \
+            -o docs/kernel.js \
+            -sMODULARIZE=1 -sEXPORT_NAME=MicrokernelModule \
+            -sENVIRONMENT=web,node -sALLOW_MEMORY_GROWTH=1 \
+            -sEXPORTED_FUNCTIONS='["_MK_Init","_MK_Step","_MK_MutexScenario","_MK_IPCScenario","_MK_InjectWatchdog","_MK_InjectIsolation","_MK_AllocateBlock","_MK_FreeBlock","_MK_GetTaskCount","_MK_GetTaskName","_MK_GetTaskState","_MK_GetTaskPriority","_MK_GetTaskProgress","_MK_GetTaskRestarts","_MK_GetTaskRecoveries","_MK_GetTaskIsolated","_MK_GetTick","_MK_GetContextSwitches","_MK_GetDecisions","_MK_GetFreeBlocks","_MK_GetTotalBlocks","_MK_GetMutexLocked","_MK_GetMutexOwner","_MK_GetIPCQueued","_MK_GetIPCWaiting","_MK_GetEventCount","_MK_GetEventType","_MK_GetEventTask","_MK_GetEventTick"]' \
+            -sEXPORTED_RUNTIME_METHODS='["UTF8ToString"]'
+      - name: Verify real kernel scenarios in WebAssembly
+        run: node scripts/test_dashboard_wasm.cjs
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
         with:
