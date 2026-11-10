@@ -39,7 +39,7 @@ static void DemoTask(TaskControlBlock *task) {
     /* Higher-priority sensor/communication tasks periodically wait for input. */
     if ((index < 2 && demo_dispatches[index] % 2U == 0U) ||
         (index >= 2 && demo_dispatches[index] % 2U == 0U)) {
-        Scheduler_Delay(task, index < 2 ? 3U : 2U);
+        Scheduler_Delay(task, index < 2 ? 12U : 3U);
     }
 }
 
