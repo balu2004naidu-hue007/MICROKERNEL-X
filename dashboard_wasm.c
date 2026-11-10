@@ -118,8 +118,17 @@ int MK_InjectWatchdog(void) {
     task->state = TASK_RUNNING;
     Scheduler_TaskProgress(task);
     Scheduler_VerifyRecovery(&registry, task);
+    if (task->successful_recoveries == 0) return -3;
+
+    /*
+     * The demo performs recovery verification outside the normal scheduler
+     * dispatch path. Publish the recovered task as READY afterwards so it
+     * re-enters normal scheduling instead of remaining an orphan RUNNING
+     * task that the watchdog can no longer see making progress.
+     */
+    task->state = TASK_READY;
     RefreshEvents();
-    return task->successful_recoveries > 0 ? 0 : -3;
+    return 0;
 }
 
 int MK_InjectIsolation(void) {
