@@ -52,7 +52,8 @@ int MK_Init(void) {
     Kernel_IPC_Init();
     Scheduler_Init(&registry);
     Kernel_Mutex_Init(&demo_mutex);
-    for (int i = 0; i < DEMO_TASKS; ++i) {\n        demo_dispatches[i] = 0;
+    for (int i = 0; i < DEMO_TASKS; ++i) {
+        demo_dispatches[i] = 0;
         static const char *names[DEMO_TASKS] = {
             "SensorTask", "CommunicationTask", "WorkerTask",
             "RecoveryTask", "IsolationProbe"
