@@ -160,9 +160,9 @@ After the dashboard instrumentation was added, the host regression suite and das
 
 ## Continuous integration and Pages
 
-- `.github/workflows/ci.yml` runs host and ARM/QEMU regression checks on pushes and pull requests.
-- `.github/workflows/pages.yml` builds the host dashboard snapshot and deploys the `docs/` site to GitHub Pages on pushes to `main` and manual runs.
-- The first remote GitHub Actions and Pages runs must complete successfully before describing those hosted workflows as verified.
+- `.github/workflows/ci.yml` runs host, memory-pool, ARM/QEMU and dashboard-snapshot regression checks on pushes and pull requests.
+- `.github/workflows/pages.yml` regenerates the host dashboard snapshot, builds and tests the WebAssembly lab, and deploys the `docs/` site to GitHub Pages on pushes to `main` and manual runs.
+- Treat each workflow as validated only after its latest run completes successfully; a pushed commit alone is not a passing test.
 
 ## Known limitations
 
