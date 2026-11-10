@@ -10,7 +10,11 @@
 #define printf(...) ((void)0)
 #endif
 #ifndef MICROKERNEL_ARM
+#ifdef __EMSCRIPTEN__
+#include <emscripten/emscripten.h>
+#else
 #include <time.h>
+#endif
 #endif
 
 static volatile unsigned long system_tick = 0;
@@ -19,18 +23,25 @@ static volatile unsigned long system_tick = 0;
 
 static int Scheduler_ReadMonotonicNs(uint64_t* result)
 {
-    struct timespec ts;
+    if (result == NULL)
+    {
+        return 0;
+    }
 
-    if (result == NULL ||
-        clock_gettime(CLOCK_MONOTONIC, &ts) != 0)
+#ifdef __EMSCRIPTEN__
+    *result = (uint64_t)(emscripten_get_now() * 1000000.0);
+    return 1;
+#else
+    struct timespec ts;
+    if (clock_gettime(CLOCK_MONOTONIC, &ts) != 0)
     {
         return 0;
     }
 
     *result = ((uint64_t)ts.tv_sec * 1000000000ULL)
               + (uint64_t)ts.tv_nsec;
-
     return 1;
+#endif
 }
 
 static int Scheduler_ReadProcessCpuNs(uint64_t* result)
