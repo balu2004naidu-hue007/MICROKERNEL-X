@@ -25,7 +25,11 @@ const createModule = require("../docs/kernel.js");
   for (let i = 0; i < 8; i++) allocated.push(m._MK_AllocateBlock());
   assert.ok(allocated.every(i => i >= 0), "all memory blocks allocate");
   assert.equal(m._MK_AllocateBlock(), -1, "pool exhaustion is reported");
-  assert.equal(m._MK_FreeBlock(allocated[0]), 0, "allocated block can be freed");
+  for (let i = allocated.length - 1; i >= 0; i--) {
+    assert.equal(m._MK_FreeBlock(allocated[i]), 0, `allocated block ${i} can be freed`);
+  }
+  assert.equal(m._MK_GetFreeBlocks(), 8, "freeing every allocation restores the complete pool");
+  assert.equal(m._MK_FreeBlock(allocated[0]), -1, "double-free is rejected");
   assert.ok(m._MK_GetEventCount() > 0, "kernel trace events are retained");
   console.log("PASS: WebAssembly kernel initialization, scheduler, mutex, IPC, watchdog recovery, isolation, memory pool and trace.");
 })().catch(error => { console.error(error); process.exitCode = 1; });
