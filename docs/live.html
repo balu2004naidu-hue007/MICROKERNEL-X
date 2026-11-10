@@ -14,7 +14,7 @@
 <footer class="foot"><span>MICROKERNEL-X · C kernel APIs compiled to WebAssembly</span><span>Interactive deterministic runtime · no hardware required</span></footer>
 </main>
 <script src="kernel.js"></script><script>
-const $=id=>document.getElementById(id);let api=null,timer=null,lastAllocated=-1;
+const $=id=>document.getElementById(id);let api=null,timer=null,allocatedBlocks=[];
 function say(s){$("message").textContent=s}
 function stop(){if(timer){clearInterval(timer);timer=null}$("run").disabled=false;$("pause").disabled=true}
 function refresh(){if(!api)return;
@@ -31,6 +31,6 @@ $("pause").onclick=()=>{stop();say("Execution paused. State and trace are preser
 $("step").onclick=()=>{if(!api)return;stop();api.step();refresh();say("Advanced one kernel scheduler tick.");};
 $("reset").onclick=()=>location.reload();
 bind("stall",()=>api.stall());bind("mutex",()=>api.mutex());bind("ipc",()=>api.ipc());bind("isolate",()=>api.isolate());
-bind("alloc",()=>{lastAllocated=api.alloc();return lastAllocated;});
-bind("freeblock",()=>{if(lastAllocated<0)return "No allocated block is available to free";const r=api.freeBlock(lastAllocated);if(r===0)lastAllocated=-1;return r;});
+bind("alloc",()=>{const index=api.alloc();if(index>=0)allocatedBlocks.push(index);return index;});
+bind("freeblock",()=>{if(allocatedBlocks.length===0)return "No allocated block is available to free";const index=allocatedBlocks.pop();const result=api.freeBlock(index);if(result!==0)allocatedBlocks.push(index);return result;});
 </script></body></html>
